@@ -1,7 +1,7 @@
 const { Sequelize } = require('sequelize')
-
-const sequelize = new Sequelize('postgres', 'postgres', 'milodev123456', {
-    host: 'localhost',
+require('./env')
+const sequelize = new Sequelize('postgres', 'postgres', process.env.DATABASE_KEY_MAIN, {
+    host: process.env.DATABASE_URL,
     dialect: 'postgres'
 })
 
