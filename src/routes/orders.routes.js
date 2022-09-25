@@ -1,27 +1,24 @@
-const {Router} = require('express')
+const { Router } = require('express');
+const {
+  orderCreateController,
+  orderGetAllController,
+  orderUpdateStatusController,
+  orderDeleteController,
+} = require('../controllers/orders/orders.controller');
+const { userJWTDTO } = require('../dto/auth-jwt.dto');
 
-//**ESPECIFICACIONES GENERALES DE LA RUTA */
-//Todas las rutas deben estar protegidas por un metodo de autentificacion.
-//Para el endpoint POST / se debe realizar lo siguiente:
-    //Se debe buscar si existe la comida (meal), si no, enviar error.
-    //Calcular el precio para el usuario, multiplicar el precio de la comida (meal) encontrada previamente, por la cantidad solicitada por el usuario.
-    //Crear una nueva orden, pasando el precio calculado, el mealId de la comida ya encontrada y la cantidad solicitada por el usuario.
-//Para el endopoint PATCH y DELETE, validar que la orden este con status active antes de realizar la operacion, enviar error en caso de que no tenga este status.
-    //Solo el usuario que hizo la orden puede realizar estas operaciones.
-//Para el endpoint /me, se debe incluir la informacion de la comida que se ordeno, y del restaurant de donde se pidio la comida.
-
-const ordersRouter = Router()
+const ordersRouter = Router();
 
 //Crear una nueva order (enviar quantity y mealId por req.body)
-ordersRouter.post('/', )
+ordersRouter.post('/', userJWTDTO, orderCreateController);
 
 //Obtener todas las ordenes del usuario
-ordersRouter.get('/me', )
+ordersRouter.get('/me', userJWTDTO, orderGetAllController);
 
 //Marcar una orden por id con status completed
-ordersRouter.patch('/:id', )
+ordersRouter.patch('/:id', userJWTDTO, orderUpdateStatusController);
 
 //Marcar una orden por id con status cancelled
-ordersRouter.delete('/:id', )
+ordersRouter.delete('/:id', userJWTDTO, orderDeleteController);
 
-module.exports = {ordersRouter}
+module.exports = { ordersRouter };

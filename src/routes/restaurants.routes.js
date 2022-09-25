@@ -1,33 +1,77 @@
-const {Router} = require('express')
+const { Router } = require('express');
+const {
+  restaurantDeleteController,
+  restaurantCreateController,
+  restaurantDeleteReviewController,
+  restaurantGetAllController,
+  restaurantGetByIdController,
+  restaurantCreateReviewController,
+  restaurantUpdateDataController,
+  restaurantUpdateReviewController,
+} = require('../controllers/restaurants/restaurants.controllers');
+const { userJWTDTO } = require('../dto/auth-jwt.dto');
+const {
+  restaurantCreateValidators,
+} = require('../dto/restaurants/restaurantCreateValidatorsDTO');
+const { restaurantExists } = require('../middlewares/Restaurants.middlewares');
+const { reviewExistsById } = require('../middlewares/Reviews.middlewares');
 
-//**ESPECIFICACIONES GENERALES DE LA RUTA */
-//Todas las rutas, excepto GET / y /:id, deben estar protegidas por un metodo de autentificacion. Se debe incluir las reseñas de los restaurants.
-//El endpoint para crear restaurants, debe estar protegido con express-validator.
-//Los endpoints PATCH /:id y DELETE/:id deben estar protegidos para que unicamente el usuario admin pueda realizar estas acciones.
-const restaurantsRouter = Router()
+const restaurantsRouter = Router();
 
 //Crear un nuevo restaurant (enviar name, address, rating (INT))
-restaurantsRouter.post('/',)
+restaurantsRouter.post(
+  '/',
+  restaurantCreateValidators,
+  userJWTDTO,
+  restaurantCreateController
+);
 
 //Obtener todos los restaurants con status active
-restaurantsRouter.get('/',)
+restaurantsRouter.get('/', restaurantGetAllController);
 
 //Obtener restaurant por ID
-restaurantsRouter.get('/:id',)
+restaurantsRouter.get('/:id', restaurantExists, restaurantGetByIdController);
 
 //Actualizar restaurant (name, address) UNICAMENTE EL ADMIN PUEDE REALIZAR ESTA ACCION
-restaurantsRouter.patch('/:id',)
+restaurantsRouter.patch(
+  '/:id',
+  userJWTDTO,
+  restaurantExists,
+  restaurantUpdateDataController
+);
 
 //Deshabilitar restaurant UNICAMENTE EL ADMIN PUEDE REALIZAR ESTA ACCION
-restaurantsRouter.delete('/:id',)
+restaurantsRouter.delete(
+  '/:id',
+  userJWTDTO,
+  restaurantExists,
+  restaurantDeleteController
+);
 
 //crear una nueva reseña en el restaurant, siendo restaurant Id el id del restaurant (enviar comment, rating (INT) en req.body)
-restaurantsRouter.post('/reviews/:restaurantId',)
+restaurantsRouter.post(
+  '/reviews/:restaurantId',
+  userJWTDTO,
+  restaurantExists,
+  restaurantCreateReviewController
+);
 
 // Actualizar una reseña hecha en un restaurant, siendo :id el id de la reseña (comment, rating) SOLO EL AUTOR DE LA RESEÑA PUEDE ACTUALIZAR SU PROPIA RESEÑA
-restaurantsRouter.patch('/reviews/:id', )
+restaurantsRouter.patch(
+  '/reviews/:id',
+  userJWTDTO,
+  reviewExistsById,
+  restaurantExists,
+  restaurantUpdateReviewController
+);
 
 //Actualizar una reseña hecha en un restaurant a status deleted, siendo  :id el id de la reseña. SOLO EL AUTOR DE LA RESEÑA PUEDE ACTUALIZAR SU PROPIA RESEÑA
-restaurantsRouter.delete('/reviews/:id', )
+restaurantsRouter.delete(
+  '/reviews/:id',
+  userJWTDTO,
+  reviewExistsById,
+  restaurantExists,
+  restaurantDeleteReviewController
+);
 
-module.exports = {restaurantsRouter}
+module.exports = { restaurantsRouter };
